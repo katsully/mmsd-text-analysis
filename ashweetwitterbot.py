@@ -1,11 +1,14 @@
 import twython
 
-# Twitter API keys go here
-CONSUMER_KEY = 'g6SmnVniAR0rVCHBWapu7ssX8'
-CONSUMER_SECRET = 'wOIXruS0b4UmhzeL7DUkmS4B2avkEAjyiXLcmVgaVuyJEA3M1O'
+with open("twitter_keys.txt") as f:
+    content = f.readlines()
 
-OAUTH_TOKEN = '104565604-R6kibEf2lYsMG8fbRJyZ9JWZ7KHd1wNKUsJAd8VV'
-OAUTH_TOKEN_SECRET = 'HszsWiaEMDrDjJrf4htgVW1nXG2SiFV3UlR4KTO1qWHbg'
+# Twitter API keys go here
+CONSUMER_KEY = content[0].rstrip()
+CONSUMER_SECRET = content[1].rstrip()
+
+OAUTH_TOKEN = content[2].rstrip()
+OAUTH_TOKEN_SECRET = content[3].rstrip()
 
 twitter = twython.Twython(CONSUMER_KEY, CONSUMER_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 
