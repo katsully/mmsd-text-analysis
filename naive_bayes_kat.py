@@ -25,23 +25,27 @@ train = [
     ('I was devastated when my nexus 4 didn\'t fit in my Louis Vuitton phone case, the same when I ditched my ipad 1', 'cell phone'),
     ('Trying to cut back on the amount of ubers I take is one of the hardest things I\'ve ever done', 'transportation'),
     ('I can\'t get a decent 4g reception around here', 'internet'),
-    ('because your closet has become a portal to possibly Narnia and/or the underworld and is chaos', 'clothes')
+    ('because your closet has become a portal to possibly Narnia and/or the underworld and is chaos', 'clothes'),
     ('I forgot my headphones at home and can\'t listen to music on the train and that is actually the worst.', 'train')
 ]
 
+test = [
+    ("my second home has no hot water", "water")
+]
 tweets = []
 for (words, sentiment) in train:
     words_filtered = [e.lower() for e in words.split() if len(e) >= 3]
     filtered_words = [word for word in words_filtered if word not in stopwords.words('english')]
     tweets.append((filtered_words, sentiment))
 
-print tweets
+# print tweets
 
 
 # create a new classifier by passing training data into the constructor 
-cl = NaiveBayesClassifier(train)
-# print cl.classify("Their burgers are amazing")  # "pos"
-# print cl.classify("I don't like their pizza.")  # "neg"
+cl = NaiveBayesClassifier(tweets)
+print "somethin", cl.classify("my second home has no hot water")
+cl2 = NaiveBayesClassifier(train)
+print cl.accuracy(test)
 
 from textblob import TextBlob
 blob = TextBlob("The beer was amazing. "
