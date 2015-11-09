@@ -47,9 +47,6 @@ print "somethin", cl.classify("my second home has no hot water")
 cl2 = NaiveBayesClassifier(train)
 print cl.accuracy(test)
 
-# print cl.classify("Their burgers are amazing")  # "pos"
-# print cl.classify("I don't like their pizza.")  # "neg"
-
 from textblob import TextBlob
 blob = TextBlob("The beer was amazing. "
                 "But the hangover was horrible. My boss was not happy.",
