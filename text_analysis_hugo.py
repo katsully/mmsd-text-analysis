@@ -66,7 +66,10 @@ def extract_features(document):
 training_set = nltk.classify.apply_features(extract_features, all_tweets)
 classifier = nltk.NaiveBayesClassifier.train(training_set)
 
-tweet = "Finishing a series on Netflix and not knowing what to do with your life after"
-print classifier.classify(extract_features(tweet.split()))
+tweet = ("Finishing a series on Netflix and not knowing what to do with your life after")
+accuracy = nltk.classify.util.accuracy(classifier,tweet);
+#print classifier.classify(extract_features(tweet.split())), accuracy
+print accuracy
+
 
 
