@@ -16,7 +16,7 @@ OAUTH_TOKEN_SECRET = content[3].rstrip()
 
 twitter = twython.Twython(CONSUMER_KEY, CONSUMER_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 
-response = twitter.search(q='#itpmssd AND [second OR third]', result_type='recent', lang='en', count=1)
+response = twitter.search(q='#itpmssd AND [worst OR ruined OR dying OR worse OR hate]', result_type='recent', lang='en', count=1)
 
 first_tweet = response['statuses'][0]
 target = first_tweet['user']['screen_name']
