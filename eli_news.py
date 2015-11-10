@@ -1,6 +1,5 @@
 import random 
 from nytimesarticle import articleAPI
-#api = articleAPI('d661f67d9b3ad99e43711924e51432dd:14:70159858')
 in_file = open('ny_times_key.txt')
 key = in_file.read()
 in_file.close()
@@ -24,7 +23,6 @@ def queryNYT():
 
 
 queryNYT()
-#len(allResults[1])
 
 news = []
 for oneSearch in allResults: 
@@ -60,7 +58,7 @@ for oneSearch in allResults:
         news.append(dic)
     #print news[1]["headline"]
 
-print(news[0])
-#print news
+print news[0].get('headline')
+print news[0].get('url')
 
 
