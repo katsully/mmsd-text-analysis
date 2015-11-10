@@ -18,4 +18,16 @@ first_tweet = response['statuses'][0]
 target = first_tweet['user']['screen_name']
 targetID = first_tweet['id_str']
 
-twitter.update_status(status="@"+target+" "+"hey again!", in_reply_to_status_id=targetID)
+link = "www.google.com"
+target_thing = "_blank"
+title = "Headline"
+source_thing = "<a href=%s target=%s>%s</a>" % (link, target_thing, title)
+print source_thing
+
+code = "We Says Thanks!"
+html = """\
+"<a href=www.google.com target=_blank>hi</a>"
+""".format(code=code)
+
+## this will get updated from eli's code
+twitter.update_status(status="@"+target+" "+"Check out this #developingworldproblem %s" % source_thing, in_reply_to_status_id=targetID)
