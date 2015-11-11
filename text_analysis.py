@@ -2,6 +2,7 @@
 import random 
 from nytimesarticle import articleAPI
 import twython
+import pandas as pd
 
 # GET TWEET
 with open("twitter_keys.txt") as f:
@@ -23,6 +24,17 @@ target = first_tweet['user']['screen_name']
 targetID = first_tweet['id_str']
 
 ## HUGO AND KAT GET TWEET AND GIVE ELI SOME KEYWORD
+
+trainingSet = []
+
+csvFile = pd.read_csv("training.csv", low_memory=False)
+
+
+for i in range(len(csvFile["tweets"])):
+
+    trainingSet.append((csvFile["tweets"][i],csvFile["category"][i]))
+
+
 
 ## GET NEWS ARTICLE
 in_file = open('ny_times_key.txt')
