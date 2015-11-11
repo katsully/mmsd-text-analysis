@@ -22,7 +22,9 @@ first_tweet = response['statuses'][0]
 target = first_tweet['user']['screen_name']
 targetID = first_tweet['id_str']
 
+## first_tweet will be what gets categorize
 ## HUGO AND KAT GET TWEET AND GIVE ELI SOME KEYWORD
+## result should be called search_term, return search_term
 
 ## GET NEWS ARTICLE
 in_file = open('ny_times_key.txt')
@@ -35,10 +37,10 @@ randomList= random.sample(range(0, len(developingCountries)), 8)
 
 allResults=[]
 
-def queryNYT():
+def queryNYT(searh_term):
     for i in range (0,len(randomList)): 
         search_number=randomList[i]
-        articles =api.search(q = "crisis" , fq = {'headline': developingCountries[search_number] , 'source':['Reuters','AP', 'The New York Times']},begin_date = 20111231)
+        articles =api.search(q = searh_term , fq = {'headline': developingCountries[search_number] , 'source':['Reuters','AP', 'The New York Times']},begin_date = 20111231)
         
         if len(articles)>0:
             allResults.append(articles)
@@ -46,7 +48,7 @@ def queryNYT():
     return allResults
 
 
-queryNYT()
+queryNYT(searh_term)
 
 news = []
 for oneSearch in allResults: 
