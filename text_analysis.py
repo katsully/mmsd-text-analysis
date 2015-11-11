@@ -3,6 +3,9 @@ import random
 from nytimesarticle import articleAPI
 import twython
 import pandas as pd
+from textblob.classifiers import NaiveBayesClassifier
+from nltk.corpus import stopwords
+import re
 
 # GET TWEET
 with open("twitter_keys.txt") as f:
@@ -17,7 +20,7 @@ OAUTH_TOKEN_SECRET = content[3].rstrip()
 
 twitter = twython.Twython(CONSUMER_KEY, CONSUMER_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 
-response = twitter.search(q='#itpmssd AND [worst OR ruined OR dying OR worse OR hate]', result_type='recent', lang='en', count=1)
+response = twitter.search(q='#firstworldproblems AND [worst OR ruined OR dying OR worse OR hate]', result_type='recent', lang='en', count=1)
 
 first_tweet = response['statuses'][0]
 target = first_tweet['user']['screen_name']
@@ -29,12 +32,23 @@ targetID = first_tweet['id_str']
 
 trainingSet = []
 
-csvFile = pd.read_csv("training.csv", low_memory=False)
+csvFile = pd.read_csv("Training_test/training.csv", low_memory=False)
 
 
 for i in range(len(csvFile["tweets"])):
 
     trainingSet.append((csvFile["tweets"][i],csvFile["category"][i]))
+
+tweets = []
+for (words, sentiment) in trainingSet:
+    words_filtered = [e.lower() for e in words.split() if len(e) >= 3]
+    filtered_words = [word for word in words_filtered if word not in stopwords.words('english')]
+    tweets.append((filtered_words, sentiment))
+
+# create a new classifier by passing training data into the constructor 
+cl = NaiveBayesClassifier(tweets)
+searh_tweet = ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)"," ",first_tweet).split())
+searh_term = searh_tweet.classify()
 
 
 
