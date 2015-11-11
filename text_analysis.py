@@ -29,29 +29,24 @@ target = "HugoLuc"
 # targetID = first_tweet['id_str']
 targetID = 1400173975
 
-## first_tweet will be what gets categorize
-## HUGO AND KAT GET TWEET AND GIVE ELI SOME KEYWORD
-## result should be called search_term, return search_term
-
+## use naive bayes classifier to classify the tweet
 trainingSet = []
 
 csvFile = pd.read_csv("Training_test/training.csv", low_memory=False)
 
-
 for i in range(len(csvFile["tweets"])):
-
     trainingSet.append((csvFile["tweets"][i],csvFile["category"][i]))
 
+# break up tweets into lists of words, take out stopwords
 tweets = []
 for (words, sentiment) in trainingSet:
     words_filtered = [e.lower() for e in words.split() if len(e) >= 3]
     filtered_words = [word for word in words_filtered if word not in stopwords.words('english')]
     tweets.append((filtered_words, sentiment))
 
-# # create a new classifier by passing training data into the constructor 
+# create a new classifier by passing training data into the constructor 
 cl = NaiveBayesClassifier(tweets)
 search_tweet = ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)"," ",first_world_tweet).split())
-# searh_tweet = ' '.join([first_world_tweet.strip("#") for tag in first_world_tweet.split() if tag.startswith("#") or tag.startswith("@")])
 print search_tweet
 search_term = cl.classify(search_tweet)
 
@@ -119,16 +114,8 @@ link = news[0].get('url')
 
 ## POST TO TWITTER
 
-# link = "www.google.com"
-# target_thing = "_blank"
-# title = "Headline"
-# source_thing = "<a href=%s target=%s>%s</a>" % (link, target_thing, title)
-# print source_thing
-
-# code = "We Says Thanks!"
-# html = """\
-# "<a href=www.google.com target=_blank>hi</a>"
-# """.format(code=code)
-
-## this will get updated from eli's code
-twitter.update_status(status="@"+target+" "+"Check out this #developingworldproblem: %s %s" % (headline, link), in_reply_to_status_id=targetID)
+## create status
+status = "@"+target+" "+"Check out this #developingworldproblem: %s %s" % (headline, link)
+print status
+# post status as reply to original tweeter
+twitter.update_status(status=status, in_reply_to_status_id=targetID)
