@@ -23,8 +23,11 @@ twitter = twython.Twython(CONSUMER_KEY, CONSUMER_SECRET, OAUTH_TOKEN, OAUTH_TOKE
 response = twitter.search(q='#firstworldproblems AND [worst OR ruined OR dying OR worse OR hate]', result_type='recent', lang='en', count=1)
 
 first_tweet = response['statuses'][0]
-target = first_tweet['user']['screen_name']
-targetID = first_tweet['id_str']
+first_world_tweet = first_tweet.get('text')
+# target = first_tweet['user']['screen_name']
+target = "HugoLuc"
+# targetID = first_tweet['id_str']
+targetID = 1400173975
 
 ## first_tweet will be what gets categorize
 ## HUGO AND KAT GET TWEET AND GIVE ELI SOME KEYWORD
@@ -45,11 +48,12 @@ for (words, sentiment) in trainingSet:
     filtered_words = [word for word in words_filtered if word not in stopwords.words('english')]
     tweets.append((filtered_words, sentiment))
 
-# create a new classifier by passing training data into the constructor 
+# # create a new classifier by passing training data into the constructor 
 cl = NaiveBayesClassifier(tweets)
-searh_tweet = ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)"," ",first_tweet).split())
-searh_term = searh_tweet.classify()
-
+search_tweet = ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)"," ",first_world_tweet).split())
+# searh_tweet = ' '.join([first_world_tweet.strip("#") for tag in first_world_tweet.split() if tag.startswith("#") or tag.startswith("@")])
+print search_tweet
+search_term = cl.classify(search_tweet)
 
 
 ## GET NEWS ARTICLE
@@ -63,10 +67,10 @@ randomList= random.sample(range(0, len(developingCountries)), 8)
 
 allResults=[]
 
-def queryNYT(searh_term):
+def queryNYT(search_term):
     for i in range (0,len(randomList)): 
         search_number=randomList[i]
-        articles =api.search(q = searh_term , fq = {'headline': developingCountries[search_number] , 'source':['Reuters','AP', 'The New York Times']},begin_date = 20111231)
+        articles =api.search(q = search_term , fq = {'headline': developingCountries[search_number] , 'source':['Reuters','AP', 'The New York Times']},begin_date = 20111231)
         
         if len(articles)>0:
             allResults.append(articles)
@@ -74,7 +78,7 @@ def queryNYT(searh_term):
     return allResults
 
 
-queryNYT(searh_term)
+queryNYT(search_term)
 
 news = []
 for oneSearch in allResults: 
