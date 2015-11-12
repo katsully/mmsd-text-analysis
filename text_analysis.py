@@ -6,9 +6,10 @@ import pandas as pd
 from textblob.classifiers import NaiveBayesClassifier
 from nltk.corpus import stopwords
 import re
+import os
 
 # GET TWEET
-with open("twitter_keys.txt") as f:
+with open("/Users/Kat/Projects/MSSD/twitter_keys.txt") as f:
     content = f.readlines()
 
 # Twitter API keys go here
@@ -20,19 +21,19 @@ OAUTH_TOKEN_SECRET = content[3].rstrip()
 
 twitter = twython.Twython(CONSUMER_KEY, CONSUMER_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 
-response = twitter.search(q='#firstworldproblems AND [worst OR ruined OR dying OR worse OR hate]', result_type='recent', lang='en', count=1)
+response = twitter.search(q='#firstworldproblems AND [worst OR ruined OR dying OR worse OR hate OR annoying]', result_type='recent', lang='en', count=1)
 
 first_tweet = response['statuses'][0]
 first_world_tweet = first_tweet.get('text')
-# target = first_tweet['user']['screen_name']
-target = "HugoLuc"
-# targetID = first_tweet['id_str']
-targetID = 1400173975
+target = first_tweet['user']['screen_name']
+# target = "HugoLuc"
+targetID = first_tweet['id_str']
+# targetID = 1400173975
 
 ## use naive bayes classifier to classify the tweet
 trainingSet = []
 
-csvFile = pd.read_csv("Training_test/training.csv", low_memory=False)
+csvFile = pd.read_csv("/Users/Kat/Projects/MSSD/Training_test/training.csv", low_memory=False, encoding='ISO-8859-1')
 
 for i in range(len(csvFile["tweets"])):
     trainingSet.append((csvFile["tweets"][i],csvFile["category"][i]))
@@ -49,10 +50,19 @@ cl = NaiveBayesClassifier(tweets)
 search_tweet = ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)"," ",first_world_tweet).split())
 print search_tweet
 search_term = cl.classify(search_tweet)
+print search_term
 
+if search_term == 'food':
+    search_term = 'hunger'
+elif search_term == 'water':
+    search_term = 'clean water'
+elif search_term == 'hygiene':
+    search_term = 'health'
+elif search_term == 'technology':
+    search_term = 'access to technology'
 
 ## GET NEWS ARTICLE
-in_file = open('ny_times_key.txt')
+in_file = open('/Users/Kat/Projects/MSSD/ny_times_key.txt')
 key = in_file.read()
 in_file.close()
 api = articleAPI(key)
@@ -65,7 +75,7 @@ allResults=[]
 def queryNYT(search_term):
     for i in range (0,len(randomList)): 
         search_number=randomList[i]
-        articles =api.search(q = search_term , fq = {'headline': developingCountries[search_number] , 'source':['Reuters','AP', 'The New York Times']},begin_date = 20111231)
+        articles =api.search(q = search_term , fq = {'headline': developingCountries[search_number] , 'source':['Reuters','AP', 'The New York Times']},begin_date = 20150101)
         
         if len(articles)>0:
             allResults.append(articles)
@@ -83,16 +93,10 @@ for oneSearch in allResults:
         if i['abstract'] is not None:
             dic['abstract'] = i['abstract'].encode("utf8")
         dic['headline'] = i['headline']['main'].encode("utf8")
-        #dic['desk'] = i['news_desk']
-        #dic['date'] = i['pub_date'][0:10] # cutting time of day.
-        #dic['section'] = i['section_name']
         if i['snippet'] is not None:
             dic['snippet'] = i['snippet'].encode("utf8")
 
-        #dic['source'] = i['source']
-        #dic['type'] = i['type_of_material']
         dic['url'] = i['web_url']
-        #dic['word_count'] = i['word_count']
         # locations
         locations = []
         for x in range(0,len(i['keywords'])):
@@ -107,15 +111,18 @@ for oneSearch in allResults:
         dic['subjects'] = subjects   
 
         news.append(dic)
-    #print news[1]["headline"]
 
-headline = news[0].get('headline')
+headline = news[0].get('headline').encode('utf-8')
 link = news[0].get('url')
 
 ## POST TO TWITTER
 
 ## create status
+# headline_total = 137 - len("@"+target+" "+"Check out this #developingworldproblem: %s " % link)
 status = "@"+target+" "+"Check out this #developingworldproblem: %s %s" % (headline, link)
-print status
+# if len(status) > 140:
+#     headline = headline[:headline_total] + "..."
+#     status = "@"+target+" "+"Check out this #developingworldproblem: %s %s" % (headline, link)
+# print status
 # post status as reply to original tweeter
 twitter.update_status(status=status, in_reply_to_status_id=targetID)
