@@ -32,21 +32,18 @@ OAUTH_TOKEN_SECRET = content[3].rstrip()
 
 twitter = twython.Twython(CONSUMER_KEY, CONSUMER_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 
-
-response = twitter.search(q='#firstworldproblems AND [worst OR ruined OR dying OR worse OR hate OR annoying OR pissed OR annoyed OR panic OR suffering OR distraught OR bitch OR damn OR fucking OR fucked OR hell OR starving]', result_type='recent', lang='en', count=1)
+response = twitter.search(q='#firstworldproblems AND [worst OR ruined OR dying OR worse OR hate OR annoying OR pissed OR annoyed OR panic OR suffering OR distraught OR bitch OR damn OR fucking OR fucked OR hell OR starving OR stupid OR forever]', result_type='recent', lang='en', count=1)
 
 first_tweet = response['statuses'][0]
 first_world_tweet = first_tweet.get('text')
 target = first_tweet['user']['screen_name']
-# target = "HugoLuc"
 targetID = first_tweet['id_str']
-# targetID = 1400173975
+
 
 ## use naive bayes classifier to classify the tweet
-trainingSet = []
-
 csvFile = pd.read_csv("Training_test/training.csv", low_memory=False, encoding='ISO-8859-1')
 
+trainingSet = []
 for i in range(len(csvFile["tweets"])):
     trainingSet.append((csvFile["tweets"][i],csvFile["category"][i]))
 
@@ -54,7 +51,6 @@ for i in range(len(csvFile["tweets"])):
 tweets = []
 for (words, sentiment) in trainingSet:
     words_filtered = [word.lower() for word in words.split() if len(word) >= 3 and word not in stopwords.words('english')]
-    # filtered_words = [word for word in words_filtered if word not in stopwords.words('english')]
     tweets.append((words_filtered, sentiment))
 
 # create a new classifier by passing training data into the constructor 
@@ -84,8 +80,7 @@ allResults=[]
 
 def queryNYT(search_term):
     for i in range (0,len(randomList)): 
-        search_number=randomList[i]
-        articles =api.search(q = search_term , fq = {'headline': developingCountries[search_number] , 'source':['Reuters','AP', 'The New York Times']},begin_date = 20150101)
+        articles =api.search(q = search_term , fq = {'headline': developingCountries[randomList[i]] , 'source':['Reuters','AP', 'The New York Times']},begin_date = 20150101)
         
         if len(articles)>0:
             allResults.append(articles)
@@ -95,29 +90,22 @@ def queryNYT(search_term):
 
 queryNYT(search_term)
 
-news = []
-for oneSearch in allResults: 
-    for i in oneSearch['response']['docs']:
-        dic = {}
-        dic['id'] = i['_id']
-        dic['headline'] = i['headline']['main'].encode("utf8")
-        dic['url'] = i['web_url']
-        news.append(dic)
-
-# test if can access article
 news_article = ""
-for new in news:
-    url = new.get('url')
-    # print url
-    r  = requests.get(url)
-    data = r.text
-    soup = BeautifulSoup(data)
-    # do something
-    errors = soup.body.findAll(text='Page No Longer Available')
-    if not errors:
-        news_article = new
-        break
-
+keep_searching = True
+for oneSearch in allResults: 
+    if keep_searching:
+        for i in oneSearch['response']['docs']:
+            dic = {}
+            dic['headline'] = i['headline']['main'].encode("utf8")
+            dic['url'] = i['web_url']
+            r  = requests.get(dic['url'])
+            data = r.text
+            soup = BeautifulSoup(data)
+            errors = soup.body.findAll(text='Page No Longer Available')
+            if not errors:
+                news_article = dic
+                keep_searching = False
+                break
 
 def make_tiny(url):
 
@@ -128,10 +116,8 @@ def make_tiny(url):
     with contextlib.closing(urlopen(request_url)) as response:
         return response.read().decode('utf-8')
 
-# headline = news_article.get('headline').decode('utf-8')
 hparser=HTMLParser.HTMLParser()
-print news_article
-headline=hparser.unescape(news_article.get('headline'))
+headline=hparser.unescape(news_article.get('headline').encode('utf8'))
 link = make_tiny(news_article.get('url'))
 
 ## POST TO TWITTER
